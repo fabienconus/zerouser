@@ -56,12 +56,12 @@ There is however another problem. DEPNotify, as most deployment solutions, requi
 
 	# Checking to see if the Finder is running now before continuing. This can help
 	# in scenarios where an end user is not configuring the device.
-	  FINDER_PROCESS=$(pgrep -l "Finder")
-	  until [ "$FINDER_PROCESS" != "" ]; do
+	FINDER_PROCESS=$(pgrep -l "Finder")
+	until [ "$FINDER_PROCESS" != "" ]; do
 	    echo "$(date "+%a %h %d %H:%M:%S"): Finder process not found. Assuming device is at login screen." >> "$DEP_NOTIFY_DEBUG"
 	    sleep 1
 	    FINDER_PROCESS=$(pgrep -l "Finder")
-	  done
+	done
 
 You would think that it would be enough to just remove these lines, but no, because in the code for DEPNotify in the `AppDelegate.swift` file you will find this :
 
@@ -135,4 +135,6 @@ The `runDEPNotify` trigger will tell JAMF to execute the policy that contains th
 
 With very few changes, it is quite simple to create a deployment process that does not require a user to log in. It has been working for us flawlessly for 2 years now.
 
-I would like to thank Armin Briegel who motivated me to write this and Pico Mitchell who provided the elegant way to load a LaunchAgent without killing the loginwindow process.
+I hope this can be useful for other people, and please feel free to [contact me](mailto:fabien.conus@edu.ge.ch) if you need more information.
+
+Finally, I would like to thank Armin Briegel who motivated me to write this and Pico Mitchell who provided the elegant way to load a LaunchAgent without killing the loginwindow process.
