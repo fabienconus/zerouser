@@ -81,12 +81,12 @@ In our case, every preference we deploy will go in the user template, which is w
 
 In order for DEPNotify to be able to run on the login window, with no user logged in, we must delete or comment the two blocks of code shown above in the starter script (if you want to use it) and in the code from DEPNotify.
 
-The second modification we have to make is to allow the DEPNotify window to be visible when no user is logged in. This is done by adding these two line to the `ViewController.swift` file in the `windowDidLoad()` function, right after `background?.sendBack()` :
+The second modification we have to make is to allow the DEPNotify window to be visible when no user is logged in. This is done by adding these two lines to the `ViewController.swift` file in the `windowDidLoad()` function, right after `background?.sendBack()` :
 
 	NSApp.windows[0].canBecomeVisibleWithoutLogin = true
 	NSApp.windows[0].orderFrontRegardless()
 
-And we must also do the same for the Background, to allow for that nice background blur to be visible. We must therefore add these two liness to the `Background.swift` file in the `windowDidLoad()` function, right after `backgroundWindow.setFrameOrigin((NSScreen.main?.frame.origin)!)` :
+And we must also do the same for the Background, to allow for that nice background blur to be visible. We must therefore add these two lines to the `Background.swift` file in the `windowDidLoad()` function, right after `backgroundWindow.setFrameOrigin((NSScreen.main?.frame.origin)!)` :
 
 	backgroundWindow.canBecomeVisibleWithoutLogin = true        
 	backgroundWindow.orderFrontRegardless()
