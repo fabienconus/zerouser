@@ -86,12 +86,12 @@ The second modification we have to make is to allow the DEPNotify window to be v
 	NSApp.windows[0].canBecomeVisibleWithoutLogin = true
 	NSApp.windows[0].orderFrontRegardless()
 
-And we must also do the same for the Background, to allow for that nice background blur to be visible. We must therefore add these two lines to the `Background.swift` file in the `windowDidLoad()` function, right after `backgroundWindow.setFrameOrigin((NSScreen.main?.frame.origin)!)` :
+The same must also be done for the Background, to allow for that nice background blur to be visible. These two lines must therefore be added to the `Background.swift` file in the `windowDidLoad()` function, right after `backgroundWindow.setFrameOrigin((NSScreen.main?.frame.origin)!)` :
 
 	backgroundWindow.canBecomeVisibleWithoutLogin = true        
 	backgroundWindow.orderFrontRegardless()
 
-Of course, this means that you will then have to recompile, sign and notarize DEPNotify.
+Of course, this means that the DEPNotify application will  have to be recompiled, signed and notarized.
 
 ### The solution
 
