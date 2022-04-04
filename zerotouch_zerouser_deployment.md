@@ -6,19 +6,19 @@ In this short text, I will explain how we deploy our macOS configuration with JA
 
 ## The context
 
-I am a physics and math teacher and a Mac Admin in a public school system in Switzerland. We manage approximately 2500 Macs in 45 different schools in secondary education (students being 12 years old up to 18 and more).
+I am a physics and math teacher and a Mac admin in a public school system in Switzerland. We manage approximately 2500 Macs in 45 different schools in secondary education (students being between 12 years old and 18 years old or more).
 
 All students and teachers work in a mixed environment made of computers running macOS, Linux and Windows.
 
-The difficulty we are facing is that none of our Macs are owned or used by a single user. They are all destined to be used by a lot of users with a wide variety of profiles (students, teachers, administrative staff, and so on).
+The difficulty we are facing is that unlike in an enterprise setting, none of our Macs are owned or used by a single user. They are all destined to be used by a lot of users with a wide variety of profiles (students, teachers, administrative staff, and so on).
 
-In terms of deployment, this specificity means that we cannot deploy preferences directly in the users home directory, since many users will be created during the school year, as they log on to the various computers. Therefore, we must deploy everything in the User Template.
+In terms of deployment, this specificity means that we cannot deploy preferences directly in the users home directory, since users will be created during the school year, as they log on to the various computers. We must therefore deploy everything in the User Template.
 
 ## The challenge
 
 We hear a lot about zero-touch deployment. The goal being that a user gets his new computer and is up and running as quickly as possible with as limited interaction as possible.
 
-A lot of MDM vendors advertise zero-touch deployment (just google "insert\_mdm\_name\_here zero touch deployment" and you are guaranteed to find a solution). But in our situation we have an additional requirement, we have to have a zero-touch **zero-user** deployment.
+A lot of MDM vendors advertise zero-touch deployment (just google "_insert\_mdm\_name\_here_ zero touch deployment" and you are guaranteed to find a solution). But in our situation we have an additional requirement, we have to have a zero-touch **zero-user** deployment.
 
 We could have created a temporary user that would be deleted after the deployment is complete, but this was not an acceptable solution for us for various security reasons.
 
@@ -34,11 +34,11 @@ That said, the choice of software is not really relevant to what will be describ
 
 ### Running a graphical user interface on the login window
 
-As I worked on this I realised I had a misconception about LaunchAgents and LaunchDaemons. There a lot of resources on the internet about these and most of the time, you will find that the bottom line is that LaunchDaemons are processes run as root (i.e. with administrator privileges) typically at startup, while LaunchAgents are run in the user-space, as the user, and typically when the user logs in.
+As I worked on this I realized I had a misconception about LaunchAgents and LaunchDaemons. There are a lot of resources on the internet about these and most of the time, you will read that the bottom line is that LaunchDaemons are processes run as root (i.e. with administrator privileges) typically at startup, while LaunchAgents are run in the user-space, as the user, and typically when the user logs in.
 
 The other difference is that processes executed by LaunchDaemons cannot display a graphical user interface, while LaunchAgents can.
 
-And now we run into why what I wanted to achieve seemed difficult : the DEPNotify-starter script is responsible for launching the DEPNotify application (which has a graphical user interface), while also making calls to the jamf binary to execute policies, and that requires administrative privileges (i.e. it requires to be run as root).
+Now we run into why what I wanted to achieve seemed difficult : the DEPNotify-starter script is responsible for launching the DEPNotify application (which has a graphical user interface), while also making calls to the jamf binary to execute policies, and that requires administrative privileges (i.e. it requires to be run as root).
 
 Do I use a LaunchDaemon in order to have administrative privileges ? Or do I use a LaunchAgent in order to be able to display a graphical user interface.
 
@@ -48,9 +48,11 @@ The trick to make a LaunchAgent load on the login window consists just in adding
 	<key>LimitLoadToSessionType</key>
 	<string>LoginWindow</string>
 
+This simple trick will allow a LaunchAgent to be loaded with the loginwindow process.
+
 ### DEPNotify
 
-DEPNotify, as most deployment solution require a user to be logged in. As a matter of fact, the [DEPNotify-starter script](https://github.com/jamf/DEPNotify-Starter) has these few lines of code that wait for the Finder to be running :
+There is however another problem. DEPNotify, as most deployment solutions, require a user to be logged in. As a matter of fact, the [DEPNotify-starter script](https://github.com/jamf/DEPNotify-Starter) has these few lines of code that wait for the Finder to be running :
 
 	# Checking to see if the Finder is running now before continuing. This can help
 	# in scenarios where an end user is not configuring the device.
@@ -71,11 +73,11 @@ You would think that it would be enough to just remove these lines, but no, beca
 		RunLoop.main.run(mode: RunLoop.Mode.default, before: Date.distantFuture)
 	}
 
-Which means that even if you tell the script not to wait for the Finder to be running, DEPNotify itself will wait for the Dock to be loaded.
+Which means that even if you tell the script not to wait for the Finder to be running, DEPNotify itself will wait for the Dock to be loaded, which means that it is necessary for a user to log in.
 
-Don't get me wrong, there are tons of good reasons to do this if the computer is destined to be used by a local user. In most enterprise situation, this is definitely to good way to do things, since it ensures all preference files have been created and can therefore be modified by the deployment.
+Don't get me wrong, there are tons of good reasons to do this, especially if the computer is destined to be used by a local user. In most enterprise situation, this is definitely to good way to do things, since it ensures all preference files have been created and can therefore be modified by the deployment.
 
-In our case, every preference we deploy will go in the user template, since a lot of users can use the same computer.
+In our case, every preference we deploy will go in the user template, which is why we don't need a user to be logged in.
 
 In order for DEPNotify to be able to run on the login window, with no user logged in, we must delete or comment the two blocks of code shown above in the starter script (if you want to use it) and in the code from DEPNotify.
 
@@ -95,7 +97,7 @@ Of course, this means that you will then have to recompile, sign and notarize DE
 
 Using all this, I was able to create my zero-touch, zero-user deployment. This is how it works :
 
-At enrollment, I run a script that creates a LaunchAgent in /Library/LaunchAgent responsible for triggering the DEPNotify starter script. In order for this LaunchAgent to load, I use the `launchctl load -S LoginWindow` command. Here is what it looks like :
+After the enrollment, I run a script that creates a LaunchAgent in `/Library/LaunchAgent` responsible for triggering the DEPNotify starter script. In order for this LaunchAgent to load, I use the `launchctl load -S LoginWindow` command. Here is what it looks like :
 
 	#!/bin/sh
 	
@@ -127,10 +129,10 @@ At enrollment, I run a script that creates a LaunchAgent in /Library/LaunchAgent
 	exit 0
 _Note: you could also package the plist and add the launchctl command as a postinstall script_
 
-The `runDEPNotify` event will tell JAMF to execute the policy that contains the modified DEPNotify-starter script, which will in turn execute the modified DEPNotify application.
+The `runDEPNotify` trigger will tell JAMF to execute the policy that contains the modified DEPNotify-starter script, which will in turn execute the modified DEPNotify application.
 
 ### Conclusion
 
-With very few modification, it is quite simple to create a deployment process that does not require a user to log in. It has been working for us flawlessly for 2 years now.
+With very few changes, it is quite simple to create a deployment process that does not require a user to log in. It has been working for us flawlessly for 2 years now.
 
 I would like to thank Armin Briegel who motivated me to write this and Pico Mitchell who provided the elegant way to load a LaunchAgent without killing the loginwindow process.
