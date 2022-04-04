@@ -75,7 +75,7 @@ You would think that it would be enough to just remove these lines, but no, beca
 
 Which means that even if you tell the script not to wait for the Finder to be running, DEPNotify itself will wait for the Dock to be loaded, which means that it is necessary for a user to log in.
 
-Don't get me wrong, there are tons of good reasons to do this, especially if the computer is destined to be used by a local user. In most enterprise situation, this is definitely to good way to do things, since it ensures all preference files have been created and can therefore be modified by the deployment.
+Don't get me wrong, there are tons of good reasons to do this, especially if the computer is destined to be used by a local user. In most enterprise situations, this is definitely to good way to do things, since it ensures all preference files have been created and can therefore be modified by the deployment.
 
 In our case, every preference we deploy will go in the user template, which is why we don't need a user to be logged in.
 
