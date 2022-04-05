@@ -100,10 +100,8 @@ Using all this, I was able to create my zero-touch, zero-user deployment. This i
 After the enrollment, I run a script that creates a LaunchAgent in `/Library/LaunchAgent` responsible for triggering the DEPNotify starter script. In order for this LaunchAgent to load, I use the `launchctl load -S LoginWindow` command. Here is what it looks like :
 
 	#!/bin/sh
-	
-	#  createLaunchAgent.sh
 	#
-	#  Created by Fabien Conus
+	#  Created by Fabien Conus for the State of Geneva
 	#
 	launchAgentName="ch.ge.edu.runDEPNotify.plist"
 	launchAgentPath="/Library/LaunchAgents/${launchAgentName}"
