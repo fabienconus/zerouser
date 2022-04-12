@@ -137,7 +137,7 @@ The `runDEPNotify` trigger will tell JAMF to execute the policy that contains th
 
 With very few changes, it is quite simple to create a deployment process that does not require a user to log in. It has been working for us flawlessly for 2 years now.
 
-I hope this can be useful for other people, and please feel free to [contact me](mailto:fabien.conus@edu.ge.ch) if you need more information.
+I hope this can be useful for other people, and please feel free to contact me if you need more information.
 
 Finally, I would like to thank Armin Briegel who motivated me to write this and Pico Mitchell who provided the elegant way to load a LaunchAgent without killing the loginwindow process.
 
