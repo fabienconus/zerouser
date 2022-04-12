@@ -103,21 +103,25 @@ After the enrollment, I run a script that creates a LaunchAgent in `/Library/Lau
 	#
 	#  Created by Fabien Conus for the State of Geneva
 	#
-	launchAgentName="ch.ge.edu.runDEPNotify.plist"
-	launchAgentPath="/Library/LaunchAgents/${launchAgentName}"
+	launchAgentLabel="ch.ge.edu.runDEPNotify"
+	launchAgentPath="/Library/LaunchAgents/${launchAgentLabel}.plist"
 	
-	# Write the LaunchAgent to execute the DEPNotify script
+	# Write LaunchAgent to execute DEPNotify script
 	echo "Writing agent ${launchAgentPath}"
-	defaults write ${launchAgentPath} Label ${launchAgentName}
-	defaults write ${launchAgentPath} LimitLoadToSessionType "LoginWindow"
-	defaults write ${launchAgentPath} ProgramArguments -array-add "/usr/local/bin/jamf"
-	defaults write ${launchAgentPath} ProgramArguments -array-add "policy"
-	defaults write ${launchAgentPath} ProgramArguments -array-add "-event"
-	defaults write ${launchAgentPath} ProgramArguments -array-add "runDEPNotify"
-	defaults write ${launchAgentPath} RunAtLoad -bool true
-	defaults write ${launchAgentPath} LaunchOnlyOnce -bool true
-	defaults write ${launchAgentPath} StandardErrorPath "/tmp/runDEPNotify.err"
-	defaults write ${launchAgentPath} StandardOutPath "/tmp/runDEPNotify.out"
+	/usr/libexec/PlistBuddy \
+		-c "Add :Label string ${launchAgentLabel}" \
+		-c 'Add :LimitLoadToSessionType string LoginWindow' \
+		-c 'Add :ProgramArguments array' \
+		-c 'Add :ProgramArguments: string /usr/local/bin/jamf' \
+		-c 'Add :ProgramArguments: string policy' \
+		-c 'Add :ProgramArguments: string -event' \
+		-c 'Add :ProgramArguments: string runDEPNotify' \
+		-c 'Add :RunAtLoad bool true' \
+		-c 'Add :LaunchOnlyOnce bool true' \
+		-c 'Add :StandardErrorPath string /tmp/runDEPNotify.err' \
+		-c 'Add :StandardOutPath string /tmp/runDEPNotify.out' \
+		"${launchAgentPath}"
+	
 	chown root:wheel ${launchAgentPath}
 	chmod 644 ${launchAgentPath}
 	
@@ -136,3 +140,5 @@ With very few changes, it is quite simple to create a deployment process that do
 I hope this can be useful for other people, and please feel free to [contact me](mailto:fabien.conus@edu.ge.ch) if you need more information.
 
 Finally, I would like to thank Armin Briegel who motivated me to write this and Pico Mitchell who provided the elegant way to load a LaunchAgent without killing the loginwindow process.
+
+**UPDATE April 12, 2022** Using the defaults command is not a good way to create a LaunchAgent, as it is designed to work with preferences. Thanks again to Pico Mitchell who pointed that out and suggested a solution using PlistBuddy instead.
